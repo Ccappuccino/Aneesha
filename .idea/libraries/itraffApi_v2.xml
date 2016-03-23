@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="itraffApi_v2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/itraffApi_v2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -22,4 +22,12 @@ android {
 dependencies {
     compile files('libs/unity-classes.jar')
     compile files('libs/unityvractivity.jar')
+    compile files('libs/itraffApi_v2.jar')
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:support-v13:23.1.1'
+    compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
 }
