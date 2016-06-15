@@ -28,16 +28,10 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.fontys.vr_vluchteling.R;
 
-import java.io.IOException;
-
-import pl.droidsonroids.gif.GifDrawable;
-import pl.droidsonroids.gif.GifImageButton;
 import pl.droidsonroids.gif.GifImageView;
 
 /**
@@ -66,6 +60,7 @@ public class CardboardOverlayView extends LinearLayout {
 
         // Set some reasonable defaults.
         setDepthOffset(0.08f);
+        setIds();
         setVisibility(View.VISIBLE);
 
         mTextFadeAnimation = new AlphaAnimation(1.0f, 0.0f);
@@ -94,6 +89,13 @@ public class CardboardOverlayView extends LinearLayout {
         public void onAnimationStart(Animation animation) {}
     }
 
+    private void setIds(){
+        mLeftView.setLogoId(R.id.logoLeft);
+        mRightView.setLogoId(R.id.logoRight);
+
+        mLeftView.setGifId(R.id.gifLeft);
+        mRightView.setGifId(R.id.gifRight);
+    }
     private void setDepthOffset(float offset) {
         mLeftView.setOffset(offset);
         mRightView.setOffset(-offset);
@@ -154,7 +156,12 @@ public class CardboardOverlayView extends LinearLayout {
             addView(gib);
 
         }
-
+        public void setLogoId(int id){
+            imageView.setId(id);
+        }
+        public void setGifId(int id){
+            gib.setId(id);
+        }
         public void setColor(int color) {
             textView.setTextColor(color);
         }
@@ -164,6 +171,7 @@ public class CardboardOverlayView extends LinearLayout {
         }
         public void setGifImage(int drawable) {
             gib.setImageResource(drawable);
+
         }
         public void setTextViewAlpha(float alpha) {
             textView.setAlpha(alpha);
@@ -203,12 +211,12 @@ public class CardboardOverlayView extends LinearLayout {
                 (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
 
             // Layout GifView
-            float gibMargin = (1.0f - gibSize) / 2.0f;
-            float gibleftMargin = (int) (width * (gibMargin + offset));
-            float gibtopMargin = (int) (height * (gibMargin + verticalGibSizeOffset));
+            float gifMargin = (1.0f - gibSize) / 2.0f;
+            float gifLeftMargin = (int) (width * (gifMargin + offset));
+            float gibTopMargin = (int) (height * (gifMargin + verticalGibSizeOffset));
             gib.layout(
-                    (int) gibleftMargin, (int) gibtopMargin,
-                    (int) (gibleftMargin + width * gibSize), (int) (gibtopMargin + height * gibSize));
+                    (int) gifLeftMargin, (int) gibTopMargin,
+                    (int) (gifLeftMargin + width * gibSize), (int) (gibTopMargin + height * gibSize));
 
 
             // Layout TextView

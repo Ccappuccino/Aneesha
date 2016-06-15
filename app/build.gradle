@@ -9,6 +9,7 @@ android {
         applicationId "com.fontys.vr_vluchteling"
         minSdkVersion 16
         targetSdkVersion 23
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -20,6 +21,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:multidex:1.0.0'
     compile files('libs/unity-classes.jar')
     compile files('libs/unityvractivity.jar')
     compile files('libs/itraffApi_v2.jar')
@@ -32,5 +34,8 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient-android:4.3.5.1'
     compile files('libs/cardboard.jar')
 
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.daimajia.easing:library:1.0.1@aar'
+    compile 'com.daimajia.androidanimations:library:1.1.3@aar'
 
 }

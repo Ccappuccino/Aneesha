@@ -17,6 +17,8 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.fontys.vr_vluchteling.R;
 import com.google.vrtoolkit.cardboard.CardboardActivity;
 import com.google.vrtoolkit.cardboard.CardboardView;
@@ -160,7 +162,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 onBackPressed();
             }
         });
-
         setCardboardView(cardboardView);
 
         mCamera = new float[16];
@@ -171,6 +172,28 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         if(mOverlayView == null) {
             mOverlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         }
+
+
+        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoLeft));
+        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoRight));
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable(){
+            public void run(){
+                //do something
+                YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoLeft));
+                YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoRight));
+
+                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifLeft));
+                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifRight));
+
+                final Handler h = new Handler();
+                h.postDelayed(new Runnable(){
+                    public void run(){
+
+                    }
+                }, 1800);
+            }
+        }, 1800);
 
         // Callback from API
         iTraffApiHandler = new Handler() {
