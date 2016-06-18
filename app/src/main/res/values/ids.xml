@@ -3,7 +3,13 @@
     <item type="id" name="logoLeft" />
     <item type="id" name="logoRight" />
 
-    <item type="id" name="gifLeft" />
-    <item type="id" name="gifRight" />
+    <item type="id" name="gifAneeshaLeft" />
+    <item type="id" name="gifAneeshaRight" />
+
+    <item type="id" name="gifHelpLeft" />
+    <item type="id" name="gifHelpRight" />
+
+    <item type="id" name="TextViewLeft" />
+    <item type="id" name="TextViewRight" />
 
 </resources>

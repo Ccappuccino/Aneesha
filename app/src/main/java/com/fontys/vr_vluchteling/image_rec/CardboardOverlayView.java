@@ -19,6 +19,8 @@ package com.fontys.vr_vluchteling.image_rec;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.opengl.Visibility;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -30,6 +32,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.fontys.vr_vluchteling.R;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -63,38 +67,37 @@ public class CardboardOverlayView extends LinearLayout {
         setIds();
         setVisibility(View.VISIBLE);
 
-        mTextFadeAnimation = new AlphaAnimation(1.0f, 0.0f);
-        mTextFadeAnimation.setDuration(5000);
     }
 
     public void show3DToast(String message) {
         setText(message);
         setTextAlpha(1f);
-        setColor(Color.BLACK);
-        mTextFadeAnimation.setAnimationListener(new EndAnimationListener() {
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                setTextAlpha(0f);
+        YoYo.with(Techniques.FadeIn).duration(1000).playOn(findViewById(R.id.TextViewLeft));
+        YoYo.with(Techniques.FadeIn).duration(1000).playOn(findViewById(R.id.TextViewRight));
+
+        final Handler h2 = new Handler();
+        h2.postDelayed(new Runnable(){
+            public void run(){
+                YoYo.with(Techniques.FadeOut).duration(1000).playOn(findViewById(R.id.TextViewLeft));
+                YoYo.with(Techniques.FadeOut).duration(1000).playOn(findViewById(R.id.TextViewRight));
             }
-        });
-        startAnimation(mTextFadeAnimation);
+        }, 3000);
     }
-    public void showGifImage(int drawable){
-        setGifImage(drawable);
-    }
-    private abstract class EndAnimationListener implements Animation.AnimationListener {
-        @Override
-        public void onAnimationRepeat(Animation animation) {}
-        @Override
-        public void onAnimationStart(Animation animation) {}
-    }
+
 
     private void setIds(){
         mLeftView.setLogoId(R.id.logoLeft);
         mRightView.setLogoId(R.id.logoRight);
 
-        mLeftView.setGifId(R.id.gifLeft);
-        mRightView.setGifId(R.id.gifRight);
+        mLeftView.setAneeshaGifId(R.id.gifAneeshaLeft);
+        mRightView.setAneeshaGifId(R.id.gifAneeshaRight);
+
+        mLeftView.setHelpGifId(R.id.gifHelpLeft);
+        mRightView.setHelpGifId(R.id.gifHelpRight);
+
+        mLeftView.setTextViewId(R.id.TextViewLeft);
+        mRightView.setTextViewId(R.id.TextViewRight);
+
     }
     private void setDepthOffset(float offset) {
         mLeftView.setOffset(offset);
@@ -105,22 +108,16 @@ public class CardboardOverlayView extends LinearLayout {
         mLeftView.setText(text);
         mRightView.setText(text);
     }
-    private void setGifImage(int drawable) {
-        mLeftView.setGifImage(drawable);
-        mRightView.setGifImage(drawable);
-    }
 
     private void setTextAlpha(float alpha) {
         mLeftView.setTextViewAlpha(alpha);
         mRightView.setTextViewAlpha(alpha);
     }
 
-    private void setColor(int color) {
-        mLeftView.setColor(color);
-        mRightView.setColor(color);
+    public void setAneeshaVisible(int v){
+        mLeftView.setAneeshaGifVisible(v);
+        mRightView.setAneeshaGifVisible(v);
     }
-
-
     /**
      * A simple view group containing some horizontally centered text underneath a horizontally
      * centered image.
@@ -132,6 +129,7 @@ public class CardboardOverlayView extends LinearLayout {
         private final ImageView imageView;
         private final TextView textView;
         private final GifImageView gib;
+        private final GifImageView gifAneesha;
         private float offset;
 
         public CardboardOverlayEyeView(Context context, AttributeSet attrs) {
@@ -140,30 +138,52 @@ public class CardboardOverlayView extends LinearLayout {
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             imageView.setAdjustViewBounds(true);  // Preserve aspect ratio.
             imageView.setImageResource(R.drawable.le_logo);
+            imageView.setAlpha(0f);
             addView(imageView);
 
-            textView = new TextView(context, attrs);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14.0f);
-            Typeface tf = Typeface.createFromAsset(context.getAssets(), "fonts/Avenir-BlackOblique.ttf");
-            textView.setTypeface(tf);
-            textView.setGravity(Gravity.CENTER);
-            textView.setShadowLayer(3.0f, 0.0f, 0.0f, Color.DKGRAY);
-            addView(textView);
+
 
             gib = new GifImageView(context, attrs);
             gib.setScaleType(GifImageView.ScaleType.CENTER_INSIDE);
             gib.setAdjustViewBounds(true);  // Preserve aspect ratio.
+            gib.setImageResource(R.drawable.cardboard_help);
+            gib.setAlpha(0f);
             addView(gib);
 
+            gifAneesha = new GifImageView(context, attrs);
+            gifAneesha.setScaleType(GifImageView.ScaleType.CENTER_INSIDE);
+            gifAneesha.setAdjustViewBounds(true);  // Preserve aspect ratio.
+            gifAneesha.setImageResource(R.drawable.aneesha_gif2);
+            gifAneesha.setVisibility(View.GONE);
+            addView(gifAneesha);
+
+            textView = new TextView(context, attrs);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12.0f);
+            Typeface tf = Typeface.createFromAsset(context.getAssets(), "fonts/Avenir-Book.ttf");
+            textView.setTypeface(tf);
+            textView.setGravity(Gravity.CENTER);
+            textView.setShadowLayer(3.0f, 0.0f, 0.0f, Color.DKGRAY);
+            textView.setTextColor(Color.BLACK);
+            addView(textView);
         }
+
         public void setLogoId(int id){
             imageView.setId(id);
         }
-        public void setGifId(int id){
+        public void setAneeshaGifId(int id){
+            gifAneesha.setId(id);
+        }
+        public void setHelpGifId(int id){
             gib.setId(id);
         }
-        public void setColor(int color) {
-            textView.setTextColor(color);
+        public void setTextViewId(int id){
+            textView.setId(id);
+        }
+        public void setAneeshaGifVisible(int v){
+            gifAneesha.setVisibility(v);
+        }
+        public void setHelpGifVisible(int v){
+            gib.setVisibility(v);
         }
 
         public void setText(String text) {
@@ -171,11 +191,9 @@ public class CardboardOverlayView extends LinearLayout {
         }
         public void setGifImage(int drawable) {
             gib.setImageResource(drawable);
-
         }
         public void setTextViewAlpha(float alpha) {
             textView.setAlpha(alpha);
-            gib.setAlpha(alpha);
         }
 
         public void setOffset(float offset) {
@@ -209,14 +227,17 @@ public class CardboardOverlayView extends LinearLayout {
             imageView.layout(
                 (int) leftMargin, (int) topMargin,
                 (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
+            gib.layout(
+                    (int) leftMargin, (int) topMargin,
+                    (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
 
             // Layout GifView
             float gifMargin = (1.0f - gibSize) / 2.0f;
             float gifLeftMargin = (int) (width * (gifMargin + offset));
-            float gibTopMargin = (int) (height * (gifMargin + verticalGibSizeOffset));
-            gib.layout(
-                    (int) gifLeftMargin, (int) gibTopMargin,
-                    (int) (gifLeftMargin + width * gibSize), (int) (gibTopMargin + height * gibSize));
+            float gifTopMargin = (int) (height * (gifMargin*3 + verticalGibSizeOffset));
+            gifAneesha.layout(
+                    (int) gifLeftMargin, (int) gifTopMargin,
+                    (int) (gifLeftMargin + width * gibSize), (int) (gifTopMargin + height * gibSize));
 
 
             // Layout TextView

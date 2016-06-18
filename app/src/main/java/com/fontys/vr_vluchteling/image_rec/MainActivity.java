@@ -16,6 +16,7 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
@@ -41,6 +42,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.List;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -88,6 +90,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private float[] mView;
     private float[] mCamera;
     boolean introFinished = false;
+    int noClickCounter = 1;
 
     public void startCamera(int texture){
         surface = new SurfaceTexture(texture);
@@ -173,27 +176,52 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             mOverlayView = (CardboardOverlayView) findViewById(R.id.overlay);
         }
 
-
-        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoLeft));
-        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoRight));
         final Handler h = new Handler();
         h.postDelayed(new Runnable(){
             public void run(){
-                //do something
-                YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoLeft));
-                YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoRight));
 
-                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifLeft));
-                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifRight));
+                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoLeft));
+                YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.logoRight));
 
                 final Handler h = new Handler();
                 h.postDelayed(new Runnable(){
                     public void run(){
+                        YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoLeft));
+                        YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.logoRight));
 
+                        mOverlayView.setAneeshaVisible(View.VISIBLE);
+
+                        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifAneeshaLeft));
+                        YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifAneeshaRight));
+
+                        //Timer when not clicking on side trigger for the user.
+                        final Handler h2 = new Handler();
+                        h2.postDelayed(new Runnable(){
+                            public void run(){
+                                if(noClickCounter == 1){
+                                    mOverlayView.show3DToast("Gebruik om Aneesha te plaatsen");
+
+                                    YoYo.with(Techniques.FadeOutDown).duration(1000).playOn(findViewById(R.id.gifAneeshaLeft));
+                                    YoYo.with(Techniques.FadeOutDown).duration(1000).playOn(findViewById(R.id.gifAneeshaRight));
+                                    YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifHelpLeft));
+                                    YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifHelpRight));
+
+                                }else if(noClickCounter == 0){
+                                    noClickCounter = 8;
+
+                                    YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.gifHelpLeft));
+                                    YoYo.with(Techniques.FadeOutUp).duration(1000).playOn(findViewById(R.id.gifHelpRight));
+                                    YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifAneeshaLeft));
+                                    YoYo.with(Techniques.FadeInUp).duration(1000).playOn(findViewById(R.id.gifAneeshaRight));
+                                }
+                                noClickCounter--;
+                                h2.postDelayed(this, 7000);
+                            }
+                        }, 20000); // after 20 seconds when not clicked on the trigger some help appears for you. Your Welcome!
                     }
-                }, 1800);
+                }, 3000); // after another 3 sec it hides and Aneesha appears
             }
-        }, 1800);
+        }, 3000); // after 3 sec appears our logo
 
         // Callback from API
         iTraffApiHandler = new Handler() {
@@ -202,34 +230,33 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 Bundle data = msg.getData();
                 if (data != null) {
                     APIResponse response = (APIResponse) data.getSerializable(ItraffApi.RESPONSE);
-
-                    String message = "";
                     try {
                         JSONObject JSONResponse = new JSONObject();
-                        JSONResponse.put("status", response.getStatus()); // set status , 0 = success , 0 != error
+                        if(response != null){
+                            if (response.getStatus() == 0) {
+                                JSONResponse.put("id", response.getObjects().get(0).getId());
+                                JSONResponse.put("name", response.getObjects().get(0).getName());
+                                mOverlayView.show3DToast("Succes");
 
-                        if (response.getStatus() == 0) {
-                            //List<APIObject> mijnlijst = response.getObjects();
+                                Intent ToolBoxActivity = new Intent(MainActivity.this, com.google.unity.GoogleUnityActivity.class);
+                                startActivity(ToolBoxActivity);
+                            } else {
+                                JSONResponse.put("error", response.getMessage());
+                                mVibrator.vibrate(1000);
 
-                            JSONResponse.put("id", response.getObjects().get(0).getId());
-                            JSONResponse.put("name", response.getObjects().get(0).getName());
-                            mOverlayView.show3DToast("Succes");
-
-                            Intent ToolBoxActivity = new Intent(MainActivity.this, com.google.unity.GoogleUnityActivity.class);
-                            startActivity(ToolBoxActivity);
-                        } else {
-                            JSONResponse.put("error", response.getMessage());
-                            mVibrator.vibrate(1000);
-                            mOverlayView.show3DToast("Where is the Poster?");
+                                Random r = new Random();
+                                int i = r.nextInt(3);
+                                String[] answers = {"Helaas, probeer het opnieuw.", "Heb je Aneesha goed geplaatst?", "Probeer het nogmaals."};
+                                mOverlayView.show3DToast(answers[i]);
+                                camera.startPreview();
+                            }
+                        }else{
+                            mOverlayView.show3DToast("Er is een probleem met je internet.");
                             camera.startPreview();
                         }
-                        // message is for debugging purposes.
-                        message = JSONResponse.toString();
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    // startDetailsActivity(mFile, message);
                 }
             }
         };
@@ -267,7 +294,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         image.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         pictureData = stream.toByteArray();
         image.recycle();
-        image = null;
 
         if (pictureData != null) {
             // check internet connection
@@ -275,8 +301,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
                 // send photo
-                String CLIENT_API_KEY = "70952f8b88";
-                Integer CLIENT_API_ID = 45590;
+                String CLIENT_API_KEY = "520aa74da6";
+                Integer CLIENT_API_ID = 45906;
                 ItraffApi api = new ItraffApi(CLIENT_API_ID, CLIENT_API_KEY, TAG, true);
 
                 if (prefs.getString("mode", "single").equals("multi")) {
@@ -285,7 +311,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                     api.setMode(ItraffApi.MODE_SINGLE);
                 }
 
-                api.sendPhoto(pictureData, iTraffApiHandler, prefs.getBoolean("allResults", true));
+                //api.sendPhoto(pictureData, iTraffApiHandler, prefs.getBoolean("allResults", true));
+                api.sendPhoto(pictureData, iTraffApiHandler);
             } else {
                 mOverlayView.show3DToast("No Internet connection.");
                 camera.startPreview();
@@ -299,12 +326,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
      */
     @Override
     public void onCardboardTrigger() {
-        Log.e(TAG, "onCardboardTrigger4");
-        //TODO remove this and create a intro dude.
+        Log.e(TAG, "onCardboardTrigger");
+        noClickCounter = 10;
         introFinished = true;
         camera.takePicture(null, null, mPicture);
-        mOverlayView.showGifImage(R.drawable.cardboard_help);
-
     }
 
     /**
