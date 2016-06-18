@@ -1,6 +1,4 @@
 package com.fontys.vr_vluchteling;
-
-import com.unity3d.player.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

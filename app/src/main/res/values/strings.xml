@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">aneesha</string>
+  <string name="app_name">Aneesha</string>
   <string name="picture">Picture</string>
   <string name="description_info">Info</string>
   <string name="request_permission">This sample needs camera permission.</string>

@@ -9,6 +9,7 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -99,6 +100,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         try
         {
             if(camera==null) {
+                camera.reconnect();
                 camera = Camera.open();
             }
             camera.setPreviewTexture(surface);
@@ -109,7 +111,32 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
             Log.w("MainActivity","CAM LAUNCH FAILED");
         }
     }
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        camera.stopPreview();
+        camera.lock();
+        camera.release();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+                Camera.getCameraInfo(i, info);
+                if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    try {
+                        // Gets to here OK
+                        camera = Camera.open(i);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //  throws runtime exception :"Failed to connect to camera service"
+                    }
+                }
+            }
+        }
+    }
     static private int createTexture(){
         int[] texture = new int[1];
 

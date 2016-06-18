@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Window;
@@ -26,7 +25,6 @@ public class UnityPlayerActivity extends Activity
 		mUnityPlayer = new UnityPlayer(this);
 		setContentView(mUnityPlayer);
 		mUnityPlayer.requestFocus();
-
 	}
 
 	// Quit Unity
@@ -66,40 +64,16 @@ public class UnityPlayerActivity extends Activity
 
 	// For some reason the multiple keyevent type is not supported by the ndk.
 	// Force event injection by overriding dispatchKeyEvent().
-	@Override
-    public boolean dispatchKeyEvent(KeyEvent event){
-        Log.e("Check?","1");
+	@Override public boolean dispatchKeyEvent(KeyEvent event)
+	{
 		if (event.getAction() == KeyEvent.ACTION_MULTIPLE)
 			return mUnityPlayer.injectEvent(event);
 		return super.dispatchKeyEvent(event);
 	}
 
 	// Pass any events not handled by (unfocused) views straight to UnityPlayer
-	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event){
-        Log.e("Check?","2");
-
-		return mUnityPlayer.injectEvent(event);
-	}
-	@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)   {
-        Log.e("Check?","3");
-
-		return mUnityPlayer.injectEvent(event);
-	}
-	@Override
-    public boolean onTouchEvent(MotionEvent event)          {
-        Log.e("Check?","4");
-
-		return mUnityPlayer.injectEvent(event);
-	}
-	/*API12*/
-    public boolean onGenericMotionEvent(MotionEvent event)  {
-        Log.e("Check?","5");
-        return mUnityPlayer.injectEvent(event);
-	}
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
+	@Override public boolean onKeyUp(int keyCode, KeyEvent event)     { return mUnityPlayer.injectEvent(event); }
+	@Override public boolean onKeyDown(int keyCode, KeyEvent event)   { return mUnityPlayer.injectEvent(event); }
+	@Override public boolean onTouchEvent(MotionEvent event)          { return mUnityPlayer.injectEvent(event); }
+	/*API12*/ public boolean onGenericMotionEvent(MotionEvent event)  { return mUnityPlayer.injectEvent(event); }
 }
